@@ -1,0 +1,38 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>TODO</title>
+    <meta charset="UTF-8" />
+    <meta name="author" content="Jun Huang" />
+    <meta
+      name="description"
+      content="A vanilla JavaScript todo application with basic UI CRUD functionality."
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="./app.css" />
+  </head>
+  <body>
+    <main class="wrapper">
+      <nav class="navbar">
+        <ul class="nav">
+          <li class="nav__item">TODO</li>
+        </ul>
+      </nav>
+      <form class="todo-form">
+        <div class="input-field">
+          <input
+            type="text"
+            id="input--add"
+            class="input"
+            placeholder="e.g. Go to the gym"
+          />
+          <label for="input--add"></label>
+        </div>
+        <input type="submit" class="button button--add" value="Add" />
+      </form>
+      <ul class="todo-collection"></ul>
+    </main>
+    <script src="./app.js"></script>
+  </body>
+</html>
