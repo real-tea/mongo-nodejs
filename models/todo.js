@@ -7,4 +7,4 @@ const newModel = new mongoose.Schema({
 
 const model = mongoose.model('TodoModel',newModel);
 
-module.exports = model;
+module.exports = model

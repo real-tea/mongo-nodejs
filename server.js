@@ -1,23 +1,30 @@
 const express = require('express');
 const path = require('path');
-const mongoose = require('mongoose');
-const bodyParser = require('body-parser');
-const Todo = require('./models/todo');
+
 const app = express();
 
+const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
+const Todo = require('./models/Todo');
 
-mongoose.connect('mongodb://localhost:27017/firstDatabase')
 
-app.use(bodyParser.json());
+
+mongoose.connect('mongodb://localhost/firstDatabase')
+
 
 // console.log('Todo is =>',Todo);
 // console.log('Mongoose model is : ',mongoose.model('TodoModel'))
 
 app.use('/',express.static(path.join(__dirname, 'assets')))
 
-app.post('/',async (req,res)=>{
+
+// app.use(bodyParser.json());
+
+app.post('/api/create',async (req,res,)=>{
     const record = req.body
     console.log(record)
+
+    //response is from mongoDB server
 
     const response = await Todo.create(record)
     console.log(response);

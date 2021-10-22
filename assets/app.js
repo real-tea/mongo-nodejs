@@ -1,197 +1,93 @@
-const todoForm = document.querySelector(".todo-form");
-const todoInput = document.querySelector("input");
-const todoCollection = document.querySelector(".todo-collection");
+const addButton = document.querySelector('.addButton')
+var input = document.querySelector('.input')
+const container = document.querySelector('.container')
 
-// document.addEventListener("DOMContentLoaded", getTodosFromLS);
+class item {
+	constructor(itemName) {
+		this.createDiv(itemName)
+	}
+	createDiv(itemName) {
+		let input = document.createElement('input')
+		input.value = itemName
+		input.disabled = true
+		input.classList.add('item_input')
+		input.type = 'text'
 
-todoForm.addEventListener("submit", addTodo);
+		let itemBox = document.createElement('div')
+		itemBox.classList.add('item')
 
-function addTodo(e) {
-  if (todoInput.value === "") {
-    // shake form to indicate that the user must input something
-    todoForm.classList.toggle("shake-horizontal");
-    setTimeout(() => {
-      todoForm.classList.toggle("shake-horizontal");
-    }, 500);
-  } else {
-    // create elements
-    const li = document.createElement("li");
-    const todoTitle = document.createElement("span");
-    const editableInput = document.createElement("input");
-    const editButton = document.createElement("button");
-    const saveButton = document.createElement("button");
-    const deleteButton = document.createElement("button");
+		let editButton = document.createElement('button')
+		editButton.innerHTML = 'EDIT'
+		editButton.classList.add('editButton')
 
-    li.classList.add("todo-collection__item");
+		let removeButton = document.createElement('button')
+		removeButton.innerHTML = 'REMOVE'
+		removeButton.classList.add('removeButton')
 
-    todoTitle.classList.add("todo-collection__item__title");
-    todoTitle.innerText = todoInput.value;
+		container.appendChild(itemBox)
 
-    editableInput.classList.add("input");
-    editableInput.classList.add("input--todo");
-    editableInput.classList.add("hidden");
-    editableInput.type = "text";
-    editableInput.value = todoInput.value;
+		itemBox.appendChild(input)
+		itemBox.appendChild(editButton)
+		itemBox.appendChild(removeButton)
 
-    editButton.classList.add("button");
-    editButton.classList.add("button--todo");
-    editButton.classList.add("button--edit");
-    editButton.innerText = "Edit";
+		editButton.addEventListener('click', () => this.edit(input))
 
-    saveButton.classList.add("button");
-    saveButton.classList.add("button--todo");
-    saveButton.classList.add("button--save");
-    saveButton.classList.add("hidden");
-    saveButton.innerText = "Save";
+		removeButton.addEventListener('click', () => this.remove(itemBox, input.value))
+	}
 
-    deleteButton.classList.add("button");
-    deleteButton.classList.add("button--todo");
-    deleteButton.classList.add("button--delete");
-    deleteButton.innerText = "Delete";
+	async edit(input) {
+		const newInput = prompt('Enter new msg:', input)
+		input.value = newInput
+		await fetch('/api/modify', {
+			method: 'POST',
+			body: JSON.stringify({ old: input.value, new: newInput }),
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		})
+	}
 
-    // add elements to todo list
-    li.appendChild(todoTitle);
-    li.appendChild(editableInput);
-    li.appendChild(editButton);
-    li.appendChild(saveButton);
-    li.appendChild(deleteButton);
-    todoCollection.appendChild(li);
-
-    function toggleTodoEditForm() {
-      todoTitle.classList.toggle("hidden");
-      editableInput.classList.toggle("hidden");
-      editButton.classList.toggle("hidden");
-      saveButton.classList.toggle("hidden");
-    }
-
-    // button event listeners
-    editButton.addEventListener("click", () => {
-      toggleTodoEditForm();
-      editableInput.focus();
-    });
-
-    saveButton.addEventListener("click", () => {
-      todoTitle.innerText = editableInput.value;
-      toggleTodoEditForm();
-    });
-
-    deleteButton.addEventListener("click", () => {
-      setTimeout(() => {
-        todoCollection.removeChild(li);
-      }, 100);
-    });
-  }
-  // clear input
-  todoInput.value = "";
-
-  e.preventDefault();
+	async remove(item, value) {
+		container.removeChild(item)
+		await fetch('/api/delete', {
+			method: 'POST',
+			body: JSON.stringify({ record: value }),
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		})
+	}
 }
 
-function getTodosFromLS() {
-  let todos;
+async function check() {
+	if (input.value != '') {
+		new item(input.value)
 
-  if (localStorage.getItem("todos") === null) {
-    todos = [];
-  } else {
-    todos = JSON.parse(localStorage.getItem("todos"));
-  }
+		await fetch('/api/create', {
+			method: 'POST',
+			body: JSON.stringify({ record: input.value }),
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		})
 
-  todos.forEach(todo => {
-    // create elements
-    const li = document.createElement("li");
-    const todoTitle = document.createElement("span");
-    const editableInput = document.createElement("input");
-    const editButton = document.createElement("button");
-    const saveButton = document.createElement("button");
-    const deleteButton = document.createElement("button");
-
-    li.classList.add("todo-collection__item");
-
-    todoTitle.classList.add("todo-collection__item__title");
-    todoTitle.innerText = todoInput.value;
-
-    editableInput.classList.add("input");
-    editableInput.classList.add("input--todo");
-    editableInput.classList.add("hidden");
-    editableInput.type = "text";
-    editableInput.value = todoInput.value;
-
-    editButton.classList.add("button");
-    editButton.classList.add("button--todo");
-    editButton.classList.add("button--edit");
-    editButton.innerText = "Edit";
-
-    saveButton.classList.add("button");
-    saveButton.classList.add("button--todo");
-    saveButton.classList.add("button--save");
-    saveButton.classList.add("hidden");
-    saveButton.innerText = "Save";
-
-    deleteButton.classList.add("button");
-    deleteButton.classList.add("button--todo");
-    deleteButton.classList.add("button--delete");
-    deleteButton.innerText = "Delete";
-
-    // add elements to todo list
-    li.appendChild(todoTitle);
-    li.appendChild(editableInput);
-    li.appendChild(editButton);
-    li.appendChild(saveButton);
-    li.appendChild(deleteButton);
-    todoCollection.appendChild(li);
-
-    function toggleTodoEditForm() {
-      todoTitle.classList.toggle("hidden");
-      editableInput.classList.toggle("hidden");
-      editButton.classList.toggle("hidden");
-      saveButton.classList.toggle("hidden");
-    }
-
-    // button event listeners
-    editButton.addEventListener("click", () => {
-      toggleTodoEditForm();
-      editableInput.focus();
-    });
-
-    saveButton.addEventListener("click", () => {
-      todoTitle.innerText = editableInput.value;
-      toggleTodoEditForm();
-    });
-
-    deleteButton.addEventListener("click", () => {
-      setTimeout(() => {
-        todoCollection.removeChild(li);
-      }, 100);
-    });
-  });
+		input.value = ''
+	}
 }
 
-// === IN PROGRESS ===
-
-function saveTodoToLS() {
-  let todos;
-  if (localStorage.getItem("todos") === null) {
-    todos = [];
-  } else {
-    todos = JSON.parse(localStorage.getItem("todos"));
-  }
-  todos.push(todoInput.value);
-  localStorage.setItem("todos", JSON.stringify(todos));
+async function boot() {
+	const records = await fetch('/api/get').then((t) => t.json())
+	records.forEach(({ record }) => {
+		new item(record)
+	})
 }
 
-function deleteTodoFromLS() {
-  let todos
-  todos =
-    localStorage.getItem("todos") === null
-      ? []
-      : JSON.parse(localStorage.getItem("todos"));
-  // todos.
-}
+boot()
 
-function updateTodoInLS() {
-  let todos;
-  todos =
-    localStorage.getItem("todos") === null
-      ? []
-      : JSON.parse(localStorage.getItem("todos"));
-}
+addButton.addEventListener('click', check)
+
+window.addEventListener('keydown', (e) => {
+	if (e.which == 13) {
+		check()
+	}
+})
