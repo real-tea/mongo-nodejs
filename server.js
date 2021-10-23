@@ -11,14 +11,41 @@ const Todo = require('./models/Todo');
 
 mongoose.connect('mongodb://localhost/firstDatabase')
 
-
-// console.log('Todo is =>',Todo);
-// console.log('Mongoose model is : ',mongoose.model('TodoModel'))
-
 app.use('/',express.static(path.join(__dirname, 'assets')))
 
 
-// app.use(bodyParser.json());
+app.use(bodyParser.json());
+
+app.post('/api/modify', async (req, res) => {
+    
+	const { old: oldTitle, new: newTitle } = req.body
+
+	const response = await Todo.updateOne(
+		{
+			record: oldTitle
+		},
+		{
+			$set: {
+				record: newTitle
+			}
+		}
+	)
+
+	console.log(response)
+
+	res.json({ status: 'ok' })
+})
+
+
+
+//Reading and adding data in FE
+app.get('/api/get',async (req,res)=>{
+    const Record = await Todo.find({})
+    res.json(Record)
+})
+
+
+//Accepting input in the database
 
 app.post('/api/create',async (req,res,)=>{
     const record = req.body
